@@ -1,0 +1,17 @@
+streamlit>=1.54.0
+stravalib>=2.4
+sqlalchemy>=2.0.46
+pandas>=2.3.3
+plotly>=6.5.2
+python-dotenv>=1.2.1
+streamlit-folium>=0.26.1
+folium>=0.20.0
+polyline>=2.0.4
+scikit-learn>=1.8.0
+scipy>=1.17.0
+statsmodels>=0.14.6
+numpy>=2.4.2
+joblib>=1.5.3
+matplotlib>=3.10.8
+seaborn>=0.13.2
+psycopg2-binary>=2.9.11
