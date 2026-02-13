@@ -22,6 +22,49 @@ def init_session_state():
         st.session_state.oauth_code = None
 
 
+def restore_session_from_database() -> bool:
+    """
+    Try to restore authentication session from database.
+
+    Checks if there's a valid OAuth token in the database and restores
+    the session state if found.
+
+    Returns:
+        True if session was restored, False otherwise
+    """
+    try:
+        from models.database.oauth_token import OAuthToken
+        from datetime import datetime
+
+        session = get_database_session()
+
+        # Find the most recent valid token
+        token = session.query(OAuthToken).filter(
+            OAuthToken.expires_at > datetime.utcnow()
+        ).order_by(OAuthToken.created_at.desc()).first()
+
+        if token:
+            # Get athlete info
+            athlete = session.query(Athlete).filter_by(id=token.athlete_id).first()
+
+            if athlete:
+                # Restore session state
+                st.session_state.authenticated = True
+                st.session_state.athlete_id = athlete.id
+                st.session_state.athlete_name = f"{athlete.firstname or ''} {athlete.lastname or ''}".strip()
+
+                logger.info(f"Restored session from database for athlete {athlete.id}")
+                session.close()
+                return True
+
+        session.close()
+        return False
+
+    except Exception as e:
+        logger.error(f"Error restoring session from database: {e}")
+        return False
+
+
 def check_authentication() -> bool:
     """
     Check if user is authenticated.
@@ -47,6 +90,10 @@ def check_authentication() -> bool:
 
         if success:
             st.rerun()
+
+    # If not authenticated in session, check database for valid token
+    if not st.session_state.authenticated:
+        restore_session_from_database()
 
     return st.session_state.authenticated
 

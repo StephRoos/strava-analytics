@@ -43,7 +43,7 @@ def main():
         session.close()
         st.warning(" Aucune activité trouvée. Synchronisez vos données dans Settings.")
         if st.button(" Aller à Settings"):
-            st.switch_page("app/pages/5_Settings.py")
+            st.switch_page("app/pages/6_Settings.py")
         st.stop()
 
     st.markdown(f"**{total_activities:,} activités** au total")
