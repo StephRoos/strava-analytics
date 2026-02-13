@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 # Page config
 st.set_page_config(
     page_title="Dashboard - Strava Analytics",
-    page_icon="🏠",
+    page_icon="",
     layout="wide"
 )
 
@@ -37,7 +37,7 @@ render_sidebar()
 @require_authentication
 def main():
     """Main dashboard page logic."""
-    st.title("🏠 Dashboard")
+    st.title(" Dashboard")
     st.markdown("Vue d'ensemble de vos statistiques d'entraînement")
 
     athlete_id = st.session_state.athlete_id
@@ -48,15 +48,15 @@ def main():
 
     if activity_count == 0:
         session.close()
-        st.warning("⚠️ Aucune activité trouvée. Veuillez synchroniser vos données.")
-        if st.button("🔄 Aller à Settings pour synchroniser"):
-            st.switch_page("app/pages/5_⚙️_Settings.py")
+        st.warning(" Aucune activité trouvée. Veuillez synchroniser vos données.")
+        if st.button(" Aller à Settings pour synchroniser"):
+            st.switch_page("app/pages/5_Settings.py")
         st.stop()
 
     # Time period selector
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.markdown("### 📊 Période")
+        st.markdown("###  Période")
     with col2:
         period = st.selectbox(
             "Période",
@@ -153,7 +153,7 @@ def render_kpis(athlete_id: int, start_date: date, session):
 
 def render_training_load_chart(athlete_id: int, start_date: date, session):
     """Render CTL/ATL/TSB chart."""
-    st.markdown("#### 📈 Charge d'Entraînement (CTL/ATL/TSB)")
+    st.markdown("####  Charge d'Entraînement (CTL/ATL/TSB)")
 
     # Query training loads
     loads = session.query(TrainingLoad).filter(
@@ -194,7 +194,7 @@ def render_training_load_chart(athlete_id: int, start_date: date, session):
 
 def render_activity_distribution(athlete_id: int, start_date: date, session):
     """Render activity type distribution pie chart."""
-    st.markdown("#### 🥧 Distribution par Type")
+    st.markdown("####  Distribution par Type")
 
     # Query activity types
     type_counts = session.query(
@@ -220,7 +220,7 @@ def render_activity_distribution(athlete_id: int, start_date: date, session):
 
 def render_weekly_volume(athlete_id: int, start_date: date, session):
     """Render weekly training volume chart."""
-    st.markdown("#### 📊 Volume Hebdomadaire")
+    st.markdown("####  Volume Hebdomadaire")
 
     # Query activities
     activities = session.query(Activity).filter(

@@ -5,15 +5,23 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "joblib>=1.5.3",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
     "numpy>=2.4.2",
     "pandas>=2.3.3",
     "plotly>=6.5.2",
+    "polyline>=2.0.4",
     "psycopg2-binary>=2.9.11",
     "python-dotenv>=1.2.1",
     "scikit-learn>=1.8.0",
+    "scipy>=1.17.0",
+    "seaborn>=0.13.2",
     "sqlalchemy>=2.0.46",
+    "statsmodels>=0.14.6",
     "stravalib>=2.4",
     "streamlit>=1.54.0",
+    "streamlit-folium>=0.26.1",
 ]
 
 [dependency-groups]

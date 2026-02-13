@@ -17,26 +17,26 @@ logger = get_logger(__name__)
 # Page configuration
 st.set_page_config(
     page_title="Strava Analytics",
-    page_icon="🚴",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        "Get Help": "https://github.com/anthropics/claude-code",
-        "Report a bug": "https://github.com/anthropics/claude-code/issues",
-        "About": "# Strava Analytics\nAnalysez vos données Strava avec ML"
+        'Get Help': None,
+        'Report a bug': None,
+        'About': None
     }
 )
 
 # Custom CSS
 st.markdown("""
     <style>
+    /* Hide Streamlit menu and header */
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+
     .main {
         padding-top: 1rem;
-    }
-    .stMetric {
-        background-color: #f0f2f6;
-        padding: 15px;
-        border-radius: 5px;
     }
     .stButton>button {
         width: 100%;
@@ -64,17 +64,17 @@ def main():
 
 def show_welcome_page():
     """Display welcome page for unauthenticated users."""
-    st.title("🚴 Bienvenue sur Strava Analytics")
+    st.title("Bienvenue sur Strava Analytics")
 
     st.markdown("""
     ### Analysez vos données Strava avec des insights avancés
 
     Strava Analytics vous permet de :
-    - 📊 **Visualiser** vos performances et progressions
-    - 🎯 **Analyser** votre charge d'entraînement (CTL/ATL/TSB)
-    - 🗺️ **Explorer** vos parcours sur des cartes interactives
-    - 🤖 **Optimiser** vos plans d'entraînement avec le machine learning
-    - 📈 **Suivre** vos métriques détaillées (zones, allure, puissance)
+    -  **Visualiser** vos performances et progressions
+    -  **Analyser** votre charge d'entraînement (CTL/ATL/TSB)
+    -  **Explorer** vos parcours sur des cartes interactives
+    -  **Optimiser** vos plans d'entraînement avec le machine learning
+    -  **Suivre** vos métriques détaillées (zones, allure, puissance)
     """)
 
     st.markdown("---")
@@ -82,15 +82,15 @@ def show_welcome_page():
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.markdown("### 📊 Tableaux de Bord")
+        st.markdown("### Tableaux de Bord")
         st.write("KPIs, graphiques interactifs et statistiques détaillées")
 
     with col2:
-        st.markdown("### 🎯 Analyse Training Load")
+        st.markdown("### Analyse Training Load")
         st.write("CTL, ATL, TSB pour optimiser votre entraînement")
 
     with col3:
-        st.markdown("### 🤖 Intelligence Artificielle")
+        st.markdown("### Intelligence Artificielle")
         st.write("Prédictions et recommandations personnalisées")
 
     st.markdown("---")
@@ -99,7 +99,7 @@ def show_welcome_page():
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        st.markdown("### 🔐 Commencez maintenant")
+        st.markdown("### Commencez maintenant")
         start_oauth_flow()
 
     st.markdown("---")
@@ -107,31 +107,31 @@ def show_welcome_page():
     # Features showcase
     with st.expander("📋 Fonctionnalités détaillées"):
         st.markdown("""
-        #### 🏠 Dashboard
+        #### Dashboard
         - KPIs : distance, activités, temps d'entraînement
         - Graphique de charge d'entraînement
         - Activités récentes
         - Distribution par type d'activité
 
-        #### 📊 Historique des Activités
+        #### Historique des Activités
         - Tableau filtrable et triable
         - Cartes interactives des parcours
         - Profils d'élévation
         - Export des données (CSV/Excel)
 
-        #### 🎯 Analyse d'Entraînement
+        #### Analyse d'Entraînement
         - Courbes CTL/ATL/TSB
         - Distribution temps par zones
         - Tendances de performance
         - Analyse de volume hebdomadaire/mensuel
 
-        #### 🤖 Recommandations ML
+        #### Recommandations ML
         - Prédiction de performance
         - Optimisation de la charge d'entraînement
         - Recommandations de récupération
         - Clustering d'activités (patterns)
 
-        #### ⚙️ Paramètres
+        #### Paramètres
         - Connexion Strava
         - Synchronisation des données
         - Configuration zones d'entraînement
@@ -159,7 +159,7 @@ def show_welcome_page():
 
 def show_dashboard_home():
     """Display main dashboard for authenticated users."""
-    st.title("🏠 Dashboard")
+    st.title("Dashboard")
 
     st.info(
         "👈 **Navigation** : Utilisez la barre latérale pour accéder aux différentes pages.\n\n"
@@ -175,12 +175,12 @@ def show_dashboard_home():
     if st.session_state.get("trigger_sync"):
         st.session_state.trigger_sync = False
         st.info("🔄 Redirection vers la page Settings pour synchroniser...")
-        st.switch_page("app/pages/5_⚙️_Settings.py")
+        st.switch_page("app/pages/5_Settings.py")
 
     st.markdown("---")
 
     # Quick metrics
-    st.markdown("### 📊 Vue d'Ensemble")
+    st.markdown("### Vue d'Ensemble")
 
     try:
         from config.settings import get_database_session
@@ -254,14 +254,14 @@ def show_dashboard_home():
     st.markdown("---")
 
     # Guide for first-time users
-    st.markdown("### 🚀 Premiers Pas")
+    st.markdown("### Premiers Pas")
 
     col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("""
         **1. Synchroniser vos données**
-        - Allez dans ⚙️ Settings
+        - Allez dans  Settings
         - Cliquez sur "Synchroniser"
         - Attendez que la sync soit terminée
         """)
@@ -269,9 +269,9 @@ def show_dashboard_home():
     with col2:
         st.markdown("""
         **2. Explorer vos données**
-        - 📊 Activity History : voir toutes vos activités
-        - 🎯 Training Analytics : analyser votre progression
-        - 🤖 ML Recommendations : obtenir des suggestions
+        -  Activity History : voir toutes vos activités
+        -  Training Analytics : analyser votre progression
+        -  ML Recommendations : obtenir des suggestions
         """)
 
 

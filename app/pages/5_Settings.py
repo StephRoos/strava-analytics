@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 # Page config
 st.set_page_config(
     page_title="Settings - Strava Analytics",
-    page_icon="⚙️",
+    page_icon="",
     layout="wide"
 )
 
@@ -30,14 +30,14 @@ render_sidebar()
 @require_authentication
 def main():
     """Main settings page logic."""
-    st.title("⚙️ Paramètres")
+    st.title(" Paramètres")
 
     # Tabs for different settings sections
     tab1, tab2, tab3, tab4 = st.tabs([
-        "🔄 Synchronisation",
+        " Synchronisation",
         "👤 Profil Athlète",
-        "🎯 Zones d'Entraînement",
-        "📊 Base de Données"
+        " Zones d'Entraînement",
+        " Base de Données"
     ])
 
     with tab1:
@@ -55,7 +55,7 @@ def main():
 
 def render_sync_section():
     """Render data synchronization section."""
-    st.markdown("### 🔄 Synchronisation des Données")
+    st.markdown("###  Synchronisation des Données")
 
     athlete_id = st.session_state.athlete_id
 
@@ -91,7 +91,7 @@ def render_sync_section():
                 if last_sync.error_message:
                     st.caption(f"Erreur : {last_sync.error_message}")
         else:
-            st.warning("⚠️ Aucune synchronisation effectuée")
+            st.warning(" Aucune synchronisation effectuée")
             st.caption("Cliquez sur 'Synchroniser Maintenant' pour commencer")
 
     with col2:
@@ -118,7 +118,7 @@ def render_sync_section():
         )
 
     # Sync button
-    if st.button("🔄 Synchroniser Maintenant", type="primary", use_container_width=True):
+    if st.button(" Synchroniser Maintenant", type="primary", use_container_width=True):
         perform_sync(
             athlete_id,
             sync_type="full" if "Complète" in sync_type else "incremental"
@@ -146,10 +146,10 @@ def perform_sync(athlete_id: int, sync_type: str = "incremental"):
         sync_manager = SyncManager(athlete_id=athlete_id)
 
         if sync_type == "full":
-            status_text.text("🔄 Synchronisation complète en cours...")
+            status_text.text(" Synchronisation complète en cours...")
             result = sync_manager.full_sync(progress_callback=progress_callback)
         else:
-            status_text.text("🔄 Synchronisation incrémentale en cours...")
+            status_text.text(" Synchronisation incrémentale en cours...")
             result = sync_manager.incremental_sync(progress_callback=progress_callback)
 
         if result["status"] == "success":
@@ -275,7 +275,7 @@ def render_athlete_profile():
 
 def render_training_zones():
     """Render training zones configuration."""
-    st.markdown("### 🎯 Zones d'Entraînement")
+    st.markdown("###  Zones d'Entraînement")
 
     athlete = get_current_athlete()
 
@@ -319,7 +319,7 @@ def render_training_zones():
         st.info(f"Aucune zone {zone_type.lower()} configurée")
 
         # Auto-generate button
-        if st.button(f"🎯 Générer Zones {zone_type} par Défaut"):
+        if st.button(f" Générer Zones {zone_type} par Défaut"):
             generate_default_zones(athlete, zone_type_key)
 
 
@@ -364,7 +364,7 @@ def generate_default_zones(athlete: Athlete, zone_type: str):
 
 def render_database_stats():
     """Render database statistics."""
-    st.markdown("### 📊 Statistiques de la Base de Données")
+    st.markdown("###  Statistiques de la Base de Données")
 
     try:
         session = get_database_session()

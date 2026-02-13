@@ -1,0 +1,27 @@
+[client]
+showErrorDetails = true
+
+[server]
+headless = true
+port = 8501
+
+[theme]
+base = "dark"
+primaryColor = "#FC4C02"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#262730"
+textColor = "#FAFAFA"
+
+[ui]
+hideTopBar = false
+
+[browser]
+gatherUsageStats = false
+
+# Hide menu
+[runner]
+magicEnabled = false
+
+# Simplify UI
+[deprecation]
+showPyplotGlobalUse = false

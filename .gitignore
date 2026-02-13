@@ -50,3 +50,21 @@ models/trained/*.h5
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
+
+# ML Models (generated)
+models/ml/saved/*.pkl
+models/ml/saved/*.json
+
+# Database
+data/strava.db
+
+# Logs
+*.log
+streamlit.log
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
