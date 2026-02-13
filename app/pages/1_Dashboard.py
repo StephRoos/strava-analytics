@@ -2,11 +2,13 @@
 
 import sys
 from pathlib import Path
+
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 from datetime import datetime, timedelta, date
 from app.auth.strava_oauth import require_authentication
 from app.components.sidebar import render_sidebar
@@ -14,7 +16,7 @@ from app.components.metrics_cards import display_kpi_row
 from app.components.charts import (
     plot_training_load_chart,
     plot_activity_distribution,
-    plot_weekly_volume
+    plot_weekly_volume,
 )
 from config.settings import get_database_session
 from models import Activity, TrainingLoad
@@ -25,9 +27,7 @@ logger = get_logger(__name__)
 
 # Page config
 st.set_page_config(
-    page_title="Dashboard - Strava Analytics",
-    page_icon="",
-    layout="wide"
+    page_title="Dashboard - Strava Analytics", page_icon="", layout="wide"
 )
 
 # Render sidebar
@@ -60,9 +60,9 @@ def main():
     with col2:
         period = st.selectbox(
             "Période",
-            ["7 jours", "30 jours", "90 jours", "Cette année"],
+            ["7 jours", "30 jours", "90 jours", "1 an", "Cette année"],
             index=1,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
         )
 
     # Calculate date range
@@ -73,6 +73,8 @@ def main():
         start_date = today - timedelta(days=30)
     elif period == "90 jours":
         start_date = today - timedelta(days=90)
+    elif period == "1 an":
+        start_date = today - timedelta(days=365)
     else:  # This year
         start_date = date(today.year, 1, 1)
 
@@ -80,6 +82,11 @@ def main():
 
     # KPIs
     render_kpis(athlete_id, start_date, session)
+
+    st.markdown("---")
+
+    # Activity Heatmap
+    render_activity_heatmap(athlete_id, session)
 
     st.markdown("---")
 
@@ -108,10 +115,11 @@ def main():
 def render_kpis(athlete_id: int, start_date: date, session):
     """Render key performance indicators."""
     # Query activities in period
-    activities = session.query(Activity).filter(
-        Activity.athlete_id == athlete_id,
-        Activity.start_date >= start_date
-    ).all()
+    activities = (
+        session.query(Activity)
+        .filter(Activity.athlete_id == athlete_id, Activity.start_date >= start_date)
+        .all()
+    )
 
     if not activities:
         st.info("Aucune activité dans cette période")
@@ -127,28 +135,30 @@ def render_kpis(athlete_id: int, start_date: date, session):
     avg_distance = total_distance / total_activities if total_activities > 0 else 0
 
     # Display KPIs
-    display_kpi_row([
-        {
-            "label": "Activités",
-            "value": f"{total_activities}",
-            "help": "Nombre total d'activités"
-        },
-        {
-            "label": "Distance Totale",
-            "value": f"{total_distance:.1f} km",
-            "help": f"Moyenne : {avg_distance:.1f} km/activité"
-        },
-        {
-            "label": "Temps Total",
-            "value": f"{total_time:.1f}h",
-            "help": "Temps en mouvement"
-        },
-        {
-            "label": "Dénivelé Total",
-            "value": f"{total_elevation:.0f} m",
-            "help": "Dénivelé positif cumulé"
-        }
-    ])
+    display_kpi_row(
+        [
+            {
+                "label": "Activités",
+                "value": f"{total_activities}",
+                "help": "Nombre total d'activités",
+            },
+            {
+                "label": "Distance Totale",
+                "value": f"{total_distance:.1f} km",
+                "help": f"Moyenne : {avg_distance:.1f} km/activité",
+            },
+            {
+                "label": "Temps Total",
+                "value": f"{total_time:.1f}h",
+                "help": "Temps en mouvement",
+            },
+            {
+                "label": "Dénivelé Total",
+                "value": f"{total_elevation:.0f} m",
+                "help": "Dénivelé positif cumulé",
+            },
+        ]
+    )
 
 
 def render_training_load_chart(athlete_id: int, start_date: date, session):
@@ -156,10 +166,12 @@ def render_training_load_chart(athlete_id: int, start_date: date, session):
     st.markdown("####  Charge d'Entraînement (CTL/ATL/TSB)")
 
     # Query training loads
-    loads = session.query(TrainingLoad).filter(
-        TrainingLoad.athlete_id == athlete_id,
-        TrainingLoad.date >= start_date
-    ).order_by(TrainingLoad.date).all()
+    loads = (
+        session.query(TrainingLoad)
+        .filter(TrainingLoad.athlete_id == athlete_id, TrainingLoad.date >= start_date)
+        .order_by(TrainingLoad.date)
+        .all()
+    )
 
     if not loads:
         st.info("Aucune donnée de charge d'entraînement. Synchronisez vos activités.")
@@ -197,13 +209,12 @@ def render_activity_distribution(athlete_id: int, start_date: date, session):
     st.markdown("####  Distribution par Type")
 
     # Query activity types
-    type_counts = session.query(
-        Activity.type,
-        func.count(Activity.id).label("count")
-    ).filter(
-        Activity.athlete_id == athlete_id,
-        Activity.start_date >= start_date
-    ).group_by(Activity.type).all()
+    type_counts = (
+        session.query(Activity.type, func.count(Activity.id).label("count"))
+        .filter(Activity.athlete_id == athlete_id, Activity.start_date >= start_date)
+        .group_by(Activity.type)
+        .all()
+    )
 
     if not type_counts:
         st.info("Aucune activité")
@@ -223,10 +234,11 @@ def render_weekly_volume(athlete_id: int, start_date: date, session):
     st.markdown("####  Volume Hebdomadaire")
 
     # Query activities
-    activities = session.query(Activity).filter(
-        Activity.athlete_id == athlete_id,
-        Activity.start_date >= start_date
-    ).all()
+    activities = (
+        session.query(Activity)
+        .filter(Activity.athlete_id == athlete_id, Activity.start_date >= start_date)
+        .all()
+    )
 
     if not activities:
         st.info("Aucune activité")
@@ -253,13 +265,125 @@ def render_weekly_volume(athlete_id: int, start_date: date, session):
     st.plotly_chart(fig, use_container_width=True)
 
 
+def render_activity_heatmap(athlete_id: int, session):
+    """Render activity heatmap calendar (like GitHub contributions)."""
+    st.markdown("### Calendrier d'Activité")
+
+    # Get last year of activities
+    end_date = date.today()
+    start_date = end_date - timedelta(days=365)
+
+    activities = (
+        session.query(Activity)
+        .filter(
+            Activity.athlete_id == athlete_id,
+            Activity.start_date >= start_date,
+            Activity.start_date <= end_date,
+        )
+        .all()
+    )
+
+    if not activities:
+        st.info("Aucune activité dans les 12 derniers mois")
+        return
+
+    # Aggregate by date
+    daily_data = {}
+    for activity in activities:
+        day = activity.start_date.date()
+        if day not in daily_data:
+            daily_data[day] = {"count": 0, "distance": 0, "time": 0}
+        daily_data[day]["count"] += 1
+        daily_data[day]["distance"] += (activity.distance or 0) / 1000
+        daily_data[day]["time"] += (activity.moving_time or 0) / 3600
+
+    # Prepare data for heatmap
+    dates = []
+    counts = []
+    distances = []
+    weeks = []
+    days_of_week = []
+
+    # Generate all dates in range
+    current = start_date
+    while current <= end_date:
+        dates.append(current)
+        data = daily_data.get(current, {"count": 0, "distance": 0, "time": 0})
+        counts.append(data["count"])
+        distances.append(data["distance"])
+
+        # Calculate week and day of week
+        week_num = (current - start_date).days // 7
+        weeks.append(week_num)
+        days_of_week.append(current.weekday())
+
+        current += timedelta(days=1)
+
+    # Create DataFrame
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "week": weeks,
+            "day": days_of_week,
+            "count": counts,
+            "distance": distances,
+        }
+    )
+
+    # Pivot for heatmap
+    heatmap_data = df.pivot(index="day", columns="week", values="count")
+
+    # Create heatmap
+    day_labels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
+
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=heatmap_data.values,
+            y=day_labels,
+            colorscale="Greens",
+            showscale=True,
+            colorbar=dict(title="Activités"),
+            hovertemplate="Semaine %{x}<br>%{y}<br>%{z} activités<extra></extra>",
+        )
+    )
+
+    fig.update_layout(
+        title="Activité quotidienne (12 derniers mois)",
+        xaxis_title="Semaines",
+        yaxis_title="",
+        height=200,
+        margin=dict(l=50, r=20, t=40, b=20),
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Stats
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        active_days = len([c for c in counts if c > 0])
+        st.metric("Jours actifs", f"{active_days}/{len(dates)}")
+    with col2:
+        total_activities = sum(counts)
+        st.metric("Total activités", total_activities)
+    with col3:
+        avg_per_week = total_activities / 52
+        st.metric("Moy/semaine", f"{avg_per_week:.1f}")
+    with col4:
+        consistency = (active_days / len(dates)) * 100
+        st.metric("Consistance", f"{consistency:.0f}%")
+
+
 def render_recent_activities(athlete_id: int, session, limit: int = 10):
     """Display recent activities table."""
-    st.markdown("### 🕐 Activités Récentes")
+    st.markdown("### Activités Récentes")
 
-    activities = session.query(Activity).filter_by(
-        athlete_id=athlete_id
-    ).order_by(Activity.start_date.desc()).limit(limit).all()
+    activities = (
+        session.query(Activity)
+        .filter_by(athlete_id=athlete_id)
+        .order_by(Activity.start_date.desc())
+        .limit(limit)
+        .all()
+    )
 
     if not activities:
         st.info("Aucune activité")
@@ -268,14 +392,22 @@ def render_recent_activities(athlete_id: int, session, limit: int = 10):
     # Build table data
     data = []
     for activity in activities:
-        data.append({
-            "Date": activity.start_date.strftime("%Y-%m-%d"),
-            "Nom": activity.name,
-            "Type": activity.type,
-            "Distance": f"{activity.distance_km:.2f} km" if activity.distance else "-",
-            "Durée": activity.duration_formatted if activity.moving_time else "-",
-            "Dénivelé": f"{activity.elevation_gain_m:.0f} m" if activity.total_elevation_gain else "-"
-        })
+        data.append(
+            {
+                "Date": activity.start_date.strftime("%Y-%m-%d"),
+                "Nom": activity.name,
+                "Type": activity.type,
+                "Distance": (
+                    f"{activity.distance_km:.2f} km" if activity.distance else "-"
+                ),
+                "Durée": activity.duration_formatted if activity.moving_time else "-",
+                "Dénivelé": (
+                    f"{activity.elevation_gain_m:.0f} m"
+                    if activity.total_elevation_gain
+                    else "-"
+                ),
+            }
+        )
 
     df = pd.DataFrame(data)
     st.dataframe(df, use_container_width=True, hide_index=True)
